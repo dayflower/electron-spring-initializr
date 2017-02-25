@@ -15,6 +15,7 @@
     "url": "https://github.com/dayflower/electron-spring-initializr.git"
   },
   "dependencies": {
+    "co": "^4.6.0",
     "dlutil": "0.0.2",
     "request": "^2.79.0",
     "unzip": "^0.1.11"

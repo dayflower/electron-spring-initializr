@@ -6,6 +6,7 @@ const fs = require('fs');
 const dlutil = require('dlutil');
 const request = require('request');
 const unzip = require('unzip');
+const co = require('co');
 
 const {app, BrowserWindow, ipcMain, dialog} = electron;
 
@@ -17,40 +18,54 @@ function createWindow() {
     win.loadURL(`file://${__dirname}/index.html`);
 }
 
+function checkExistence(p, attr) {
+    return new Promise((fulfill, reject) => {
+        fs.access(p, attr, err => fulfill(err));
+    });
+}
+
 ipcMain.on('submit', (ev, url, name) => {
     const dir = dialog.showOpenDialog(
         {
             properties: [ "openDirectory", "createDirectory", "promptToCreate" ]
         }
     )[0];
+    const target = path.join(dir, name);
 
-    fs.access(dir, fs.constants.W_OK, (err) => {
-        if (err !== null) {
-            fs.mkdirSync(dir);
+    co(function* () {
+        const dirExistence = yield checkExistence(dir, fs.constants.W_OK);
+        if (dirExistence !== null) {
+            yield new Promise((fulfill, reject) => {
+                fs.mkdir(dir, err => {
+                    err === null ? fullfill() : reject(err);
+                });
+            });
         }
 
-        const target = path.join(dir, name);
-        fs.access(target, fs.constants.W_OK, (err) => {
-            if (err === null) {
-                dlutil.rmtree(target);
-            }
+        const targetExistence = yield checkExistence(target, fs.constants.W_OK);
+        if (targetExistence === null) {
+            dlutil.rmtree(target);
+        }
 
+        yield new Promise((fulfill, reject) => {
             request(url)
                 .pipe(unzip.Extract({ path: dir }))
-                .on('close', () => {
-                    dialog.showMessageBox(
-                        {
-                            type: 'info',
-                            buttons: [ 'OK' ],
-                            title: 'Message',
-                            message: 'Project successfully created at ' + target
-                        },
-                        () => {
-                            app.quit();
-                        }
-                    )
-                });
+                .on('close', () => fulfill());
         });
+
+        yield new Promise((fulfill, reject) => {
+            dialog.showMessageBox(
+                {
+                    type: 'info',
+                    buttons: [ 'OK' ],
+                    title: 'Message',
+                    message: 'Project successfully created at ' + target
+                },
+                () => fulfill()
+            );
+        });
+
+        app.quit();
     });
 });
 
