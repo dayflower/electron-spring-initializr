@@ -44,7 +44,24 @@ ipcMain.on('submit', (ev, url, name) => {
 
         const targetExistence = yield checkExistence(target, fs.constants.W_OK);
         if (targetExistence === null) {
-            dlutil.rmtree(target);
+            const res = yield new Promise((fulfill, reject) => {
+                dialog.showMessageBox(
+                    {
+                        type: 'question',
+                        buttons: [ 'Yes', 'No' ],
+                        title: 'Message',
+                        message: `'${name}' already exists. Overwrite it?`
+                    },
+                    () => fulfill()
+                );
+            });
+
+            if (res === 0) {
+                dlutil.rmtree(target);
+            } else {
+                ev.sender.send('enable-button');
+                return;
+            }
         }
 
         yield new Promise((fulfill, reject) => {

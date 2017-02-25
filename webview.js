@@ -20,3 +20,7 @@ window.addEventListener("DOMContentLoaded", () => {
         ipcRenderer.send("submit", a.href, $("#name").val());
     });
 });
+
+ipcRenderer.on("enable-button", (ev) => {
+    $("button[name=generate-project]").prop("disabled", false);
+});
