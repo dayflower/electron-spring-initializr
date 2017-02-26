@@ -37,7 +37,7 @@ ipcMain.on('submit', (ev, url, name) => {
         if (dirExistence !== null) {
             yield new Promise((fulfill, reject) => {
                 fs.mkdir(dir, err => {
-                    err === null ? fullfill() : reject(err);
+                    err === null ? fulfill() : reject(err);
                 });
             });
         }
