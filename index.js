@@ -97,7 +97,7 @@ co(function* () {
                 );
             });
 
-            app.quit();
+            win.close();
         });
     });
 
