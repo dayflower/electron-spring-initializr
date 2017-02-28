@@ -19,6 +19,10 @@
         </style>
     </head>
     <body>
-        <webview id="main" src="https://start.spring.io/" autosize="on" preload="webview.js"></webview>
+        <webview id="main" autosize="on" preload="webview.js"></webview>
+        <script type="text/javascript">
+            const hashStart = location.hash.indexOf("#");
+            document.getElementById('main').src = hashStart >= 0 ? location.hash.substr(hashStart + 1) : "https://start.spring.io/";
+        </script>
     </body>
 </html>
