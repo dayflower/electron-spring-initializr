@@ -67,7 +67,7 @@ co(function* () {
                             title: 'Message',
                             message: `'${name}' already exists. Overwrite it?`
                         },
-                        () => fulfill()
+                        (response) => fulfill(response)
                     );
                 });
 
