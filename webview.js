@@ -9,6 +9,8 @@ window.addEventListener("DOMContentLoaded", () => {
     $(".tofullversion").addClass("hidden");
     $(".tosimpleversion").removeClass("hidden");
 
+    $("#type").val("gradle-project");
+
     form.on("submit", (ev) => {
         ev.preventDefault();
         ev.stopPropagation();
